@@ -1,4 +1,4 @@
-import 'package:chatapplication/screens/auth/login_screen.dart';
+import 'package:chatapplication/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,12 +14,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         appBarTheme: AppBarTheme(
           color: Colors.white,
-          elevation: 1,
         ),
       ),
       debugShowCheckedModeBanner: false,
       title: 'Chat App',
-      home: LoginScreen(),
+      home: SplashScreen(),
     );
   }
 }

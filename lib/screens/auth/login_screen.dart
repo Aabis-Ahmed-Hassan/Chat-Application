@@ -1,8 +1,31 @@
 import 'package:chatapplication/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isAnimate = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+
+    Future.delayed(
+        Duration(
+          milliseconds: 500,
+        ), () {
+      setState(() {
+        _isAnimate = true;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,29 +40,37 @@ class LoginScreen extends StatelessWidget {
           padding: EdgeInsets.symmetric(
             horizontal: width * 0.05,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Stack(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                  height: height * .2,
-                  // width: width * .3,
-                  // fit: BoxFit.cover,
-                  'assets/app_icon.png'),
-              SizedBox(
-                height: height * .2,
+              AnimatedPositioned(
+                duration: Duration(
+                  seconds: 1,
+                ),
+                top: height * .2,
+                right: _isAnimate ? width / 3 : 0,
+                child: Image.asset(
+                    height: height * .15,
+                    // width: width * .3,
+                    // fit: BoxFit.cover,
+                    'assets/app_icon.png'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomeScreen(),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: height * .015),
+              AnimatedPositioned(
+                bottom: height * .3,
+                duration: Duration(
+                  seconds: 1,
+                ),
+                right: _isAnimate ? width / 3 : 0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(),
+                      ),
+                    );
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
