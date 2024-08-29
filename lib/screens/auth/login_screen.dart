@@ -34,9 +34,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   //
-  _login() {
+  _login() async {
     Utils.showProgressBar(context);
-    signInWithGoogle().then((value) async {
+    await signInWithGoogle().then((value) async {
       // print(value!.user);
       // print('\n\n');
       //
@@ -124,8 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 right: _isAnimate ? width / 4 : 0,
                 child: ElevatedButton(
-                  onPressed: () {
-                    _login();
+                  onPressed: () async {
+                    await _login();
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -1,4 +1,3 @@
-import 'package:chatapplication/screens/auth/login_screen.dart';
 import 'package:chatapplication/screens/edit_profile.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,19 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
             CupertinoIcons.home,
           ),
         ),
-        title: Text(
-            'Hey ${list[0].name!.length > 7 ? list[0].name!.substring(0, 7) + '...' : list[0].name}' +
-                '👋'),
+        title: Text('Hello 👋'),
         actions: [
-          IconButton(
-            onPressed: () async {
-              await FirebaseInstances.auth.signOut().then((a) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              });
-            },
-            icon: Icon(Icons.logout),
-          ),
           // show profile image
 
           InkWell(
@@ -56,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: CircleAvatar(
               backgroundImage: NetworkImage(
-                FirebaseInstances.currentUser.photoURL ??
+                list[0].image ??
                     'https://cdn-icons-png.flaticon.com/128/149/149071.png',
               ),
             ),
@@ -79,17 +67,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text('No Connection Found'),
               );
             }
+            list = [];
+            List data = snapshot.data!.docs;
+            for (QueryDocumentSnapshot<Map<String, dynamic>> i in data) {
+              list.add(ChatUser.fromJson(i.data()));
+            }
+
             return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
+              // itemCount: snapshot.data!.docs.length,
+              itemCount: list.length,
               physics: BouncingScrollPhysics(),
               itemBuilder: (context, index) {
                 // if (FirebaseInstances.currentUser.uid !=
                 //     snapshot.data!.docs[index].get('id'))
-                list = [];
-                List data = snapshot.data!.docs;
-                for (QueryDocumentSnapshot<Map<String, dynamic>> i in data) {
-                  list.add(ChatUser.fromJson(i.data()));
-                }
                 return ChatCard(
                   // user: ChatUser.fromJson(snapshot.data!.docs[index].data()),
                   user: list[index],
