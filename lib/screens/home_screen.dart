@@ -1,6 +1,6 @@
 import 'package:chatapplication/components/chat_card.dart';
 import 'package:chatapplication/screens/auth/login_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -10,42 +10,39 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(
-            CupertinoIcons.home,
-          ),
-        ),
-        title: Text(
-          'HomeScreen',
-        ),
-        actions: [
-          IconButton(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: IconButton(
             onPressed: () {},
-            icon: Icon(Icons.search),
+            icon: Icon(
+              CupertinoIcons.home,
+            ),
           ),
-          IconButton(
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut().then((a) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              });
-            },
-            icon: Icon(Icons.logout),
+          title: Text(
+            'HomeScreen',
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Expanded(
-          child: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return ChatCard();
-            },
-          ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.search),
+            ),
+            IconButton(
+              onPressed: () async {
+                await FirebaseInstances.auth.signOut().then((a) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                });
+              },
+              icon: Icon(Icons.logout),
+            ),
+          ],
         ),
-      ),
-    );
+        body: ListView.builder(
+          itemCount: 10,
+          physics: BouncingScrollPhysics(),
+          itemBuilder: (context, index) {
+            return ChatCard();
+          },
+        ));
   }
 }

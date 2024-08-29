@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chatapplication/screens/home_screen.dart';
+import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:chatapplication/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await googleUser?.authentication;
       final credentials = GoogleAuthProvider.credential(
           accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
-      return await FirebaseAuth.instance.signInWithCredential(credentials);
+      return await FirebaseInstances.auth.signInWithCredential(credentials);
     } catch (e) {
       print('signInWithGoogle: $e');
       Utils.showSnackBar(context, 'An error occured (Internet Issue)');

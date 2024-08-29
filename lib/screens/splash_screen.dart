@@ -1,6 +1,6 @@
 import 'package:chatapplication/screens/auth/login_screen.dart';
 import 'package:chatapplication/screens/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
           milliseconds: 1500,
         ), () {
       // user is login
-      if (FirebaseAuth.instance.currentUser != null) {
+      if (FirebaseInstances.auth.currentUser != null) {
         // move to homescreen
         Navigator.pushReplacement(
           context,
