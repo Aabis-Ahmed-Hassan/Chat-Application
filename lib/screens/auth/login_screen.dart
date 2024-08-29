@@ -1,5 +1,7 @@
 import 'package:chatapplication/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -27,13 +29,42 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  //
+  _login() {
+    signInWithGoogle().then((value) {
+      print(value.user);
+      print('\n\n');
+
+      print(value.credential);
+      print('\n\n');
+      print(value.additionalUserInfo);
+      print('\n\n');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    });
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+    final credentials = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
+    return await FirebaseAuth.instance.signInWithCredential(credentials);
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome to Chat App'),
+        title: Text('Login'),
       ),
       body: Center(
         child: Padding(
@@ -61,15 +92,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 duration: Duration(
                   seconds: 1,
                 ),
-                right: _isAnimate ? width / 3 : 0,
+                right: _isAnimate ? width / 4 : 0,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeScreen(),
-                      ),
-                    );
+                    _login();
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
