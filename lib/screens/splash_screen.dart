@@ -1,4 +1,6 @@
 import 'package:chatapplication/screens/auth/login_screen.dart';
+import 'package:chatapplication/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,12 +21,25 @@ class _SplashScreenState extends State<SplashScreen> {
         Duration(
           milliseconds: 1500,
         ), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoginScreen(),
-        ),
-      );
+      // user is login
+      if (FirebaseAuth.instance.currentUser != null) {
+        // move to homescreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
+      }
+      // user is not loing
+      else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoginScreen(),
+          ),
+        );
+      }
     });
   }
 

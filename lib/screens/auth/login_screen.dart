@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:chatapplication/screens/home_screen.dart';
+import 'package:chatapplication/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -31,11 +34,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   //
   _login() {
+    Utils.showProgressBar(context);
     signInWithGoogle().then((value) {
-      print(value.user);
+      Navigator.pop(context);
+      print(value!.user);
       print('\n\n');
 
-      print(value.credential);
+      print(value!.credential);
       print('\n\n');
       print(value.additionalUserInfo);
       print('\n\n');
@@ -48,14 +53,21 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future<UserCredential> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      await InternetAddress.lookup('google.com');
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-    final credentials = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
-    return await FirebaseAuth.instance.signInWithCredential(credentials);
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+      final credentials = GoogleAuthProvider.credential(
+          accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
+      return await FirebaseAuth.instance.signInWithCredential(credentials);
+    } catch (e) {
+      print('signInWithGoogle: $e');
+      Utils.showSnackBar(context, 'An error occured (Internet Issue)');
+      return null;
+    }
   }
 
   @override

@@ -1,8 +1,11 @@
+import 'package:chatapplication/components/chat_card.dart';
+import 'package:chatapplication/screens/auth/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +26,25 @@ class HomeScreen extends StatelessWidget {
             icon: Icon(Icons.search),
           ),
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.add),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut().then((a) {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
+              });
+            },
+            icon: Icon(Icons.logout),
           ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Expanded(
+          child: ListView.builder(
+            itemCount: 10,
+            itemBuilder: (context, index) {
+              return ChatCard();
+            },
+          ),
+        ),
       ),
     );
   }
