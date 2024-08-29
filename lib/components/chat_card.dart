@@ -1,9 +1,14 @@
+import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatCard extends StatelessWidget {
-  const ChatCard({super.key});
+  ChatUser user;
+  ChatCard({
+    super.key,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +23,11 @@ class ChatCard extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        title: Text('Human'),
-        subtitle: Text('Last message'),
-        trailing: Text('12:00 PM'),
+        title: Text(
+          user.name.toString(),
+        ),
+        subtitle: Text(user.lastActive.toString()),
+        trailing: Text(user.lastActive.toString()),
       ),
     );
   }

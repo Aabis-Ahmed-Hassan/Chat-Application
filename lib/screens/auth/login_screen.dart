@@ -36,21 +36,38 @@ class _LoginScreenState extends State<LoginScreen> {
   //
   _login() {
     Utils.showProgressBar(context);
-    signInWithGoogle().then((value) {
-      Navigator.pop(context);
-      print(value!.user);
-      print('\n\n');
+    signInWithGoogle().then((value) async {
+      // print(value!.user);
+      // print('\n\n');
+      //
+      // print(value!.credential);
+      // print('\n\n');
+      // print(value.additionalUserInfo);
+      // print('\n\n');
 
-      print(value!.credential);
-      print('\n\n');
-      print(value.additionalUserInfo);
-      print('\n\n');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        ),
-      );
+      if (await FirebaseInstances.userExistence()) {
+        // close circular progress indicator in the dialogue box
+        Navigator.pop(context);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
+      } else {
+        FirebaseInstances.createUser().then((e) {
+          // close circular progress indicator in the dialogue box
+          Navigator.pop(context);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ),
+          );
+        });
+      }
     });
   }
 
