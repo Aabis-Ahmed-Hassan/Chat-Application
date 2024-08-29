@@ -51,27 +51,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(width / 2),
-                child: CachedNetworkImage(
-                  height: width * .4,
-                  width: width * .4,
-                  fit: BoxFit.fill,
-                  imageUrl: widget.currentUser.image ??
-                      'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-                  placeholder: (context, url) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  },
-                  errorWidget: (context, url, error) {
-                    return Icon(CupertinoIcons.person);
-                  },
-                ),
+              // profile image
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(width / 2),
+                    child: CachedNetworkImage(
+                      height: width * .4,
+                      width: width * .4,
+                      fit: BoxFit.fill,
+                      imageUrl: widget.currentUser.image ??
+                          'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                      placeholder: (context, url) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                      errorWidget: (context, url, error) {
+                        return Icon(CupertinoIcons.person);
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: MaterialButton(
+                      color: Colors.white,
+                      shape: CircleBorder(),
+                      onPressed: () {},
+                      child: Icon(
+                        Icons.edit,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: height * .025),
+              // email
               Text(widget.currentUser.email ?? 'noemail@gmail.com'),
               SizedBox(height: height * .025),
+              // name text field
               TextField(
                 decoration: InputDecoration(
                   label: Text('Name'),
@@ -81,6 +100,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _nameController,
               ),
               SizedBox(height: height * .025),
+              // about text field
+
               TextField(
                 decoration: InputDecoration(
                   label: Text('About'),
@@ -90,6 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _aboutController,
               ),
               SizedBox(height: height * .025),
+              // update button
               ElevatedButton(
                 onPressed: () async {
                   setState(() {
