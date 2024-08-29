@@ -1,5 +1,7 @@
 import 'package:chatapplication/screens/auth/login_screen.dart';
+import 'package:chatapplication/screens/edit_profile.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<ChatUser> list = [];
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -28,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         title: Text(
-            'Hey ${FirebaseInstances.currentUser.displayName!.length > 7 ? FirebaseInstances.currentUser.displayName!.substring(0, 7) + '...' : FirebaseInstances.currentUser.displayName}' +
+            'Hey ${list[0].name!.length > 7 ? list[0].name!.substring(0, 7) + '...' : list[0].name}' +
                 '👋'),
         actions: [
           IconButton(
@@ -40,10 +43,22 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             icon: Icon(Icons.logout),
           ),
-          CircleAvatar(
-            backgroundImage: NetworkImage(
-              FirebaseInstances.currentUser.photoURL ??
-                  'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+          // show profile image
+
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfileScreen(currentUser: list[0]),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(
+                FirebaseInstances.currentUser.photoURL ??
+                    'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+              ),
             ),
           ),
           SizedBox(
@@ -68,11 +83,17 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: snapshot.data!.docs.length,
               physics: BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                if (FirebaseInstances.currentUser.uid !=
-                    snapshot.data!.docs[index].get('id'))
-                  return ChatCard(
-                    user: ChatUser.fromJson(snapshot.data!.docs[index].data()),
-                  );
+                // if (FirebaseInstances.currentUser.uid !=
+                //     snapshot.data!.docs[index].get('id'))
+                list = [];
+                List data = snapshot.data!.docs;
+                for (QueryDocumentSnapshot<Map<String, dynamic>> i in data) {
+                  list.add(ChatUser.fromJson(i.data()));
+                }
+                return ChatCard(
+                  // user: ChatUser.fromJson(snapshot.data!.docs[index].data()),
+                  user: list[index],
+                );
               },
             );
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
