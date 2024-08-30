@@ -1,6 +1,8 @@
 import 'package:chatapplication/models/ChatUser.dart';
+import 'package:chatapplication/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 
 class FirebaseInstances {
   static FirebaseAuth auth = FirebaseAuth.instance;
@@ -61,6 +63,28 @@ class FirebaseInstances {
         getSelfData();
       }
       print('my data ${me.name}');
+    });
+  }
+
+  static Future<void> updateProfile(
+      BuildContext context, String name, String about) async {
+    print('name ' + me.name.toString());
+    print('about ' + me.about.toString());
+    print('id ' + me.id.toString());
+
+    await firestore
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({
+      'name': name,
+      'about': about,
+    }).then((e) {
+      Utils.showSnackBar(context, 'Profile Updated Successfully');
+      // // the data on firebase  gets updated but to show the updated version on the app when we even the profile screen again,
+      // // we need to call this function
+      FirebaseInstances.getSelfData();
+    }).catchError((e) {
+      Utils.showSnackBar(context, 'An Error Occurred');
     });
   }
 }
