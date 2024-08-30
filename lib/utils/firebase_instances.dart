@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FirebaseInstances {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
-  static User currentUser = auth.currentUser!;
+  static User currentUser = FirebaseAuth.instance.currentUser!;
 // check if user already exists
   static Future<bool> userExistence() async {
     return (await FirebaseFirestore.instance
@@ -34,5 +34,33 @@ class FirebaseInstances {
         .collection('users')
         .doc(currentUser.uid)
         .set(newUser.toJson());
+  }
+
+  // static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsersExceptSelf() {
+  //   return firestore.collection('users').snapshots();
+  // }
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsersExceptSelf() {
+    return firestore
+        .collection('users')
+        .where('id', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
+  }
+
+  static late ChatUser me;
+  static Future<void> getSelfData() async {
+    print('current user uid in get self data function ' +
+        FirebaseAuth.instance.currentUser!.uid);
+    await firestore
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((user) {
+      if (user != null) {
+        me = ChatUser.fromJson(user.data()!);
+      } else {
+        getSelfData();
+      }
+      print('my data ${me.name}');
+    });
   }
 }

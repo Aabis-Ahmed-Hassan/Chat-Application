@@ -18,6 +18,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
     super.initState();
 
+    // Future.delayed(
+    //     Duration(
+    //       milliseconds: 1500,
+    //     ), () {
+    //   Navigator.pushReplacement(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => LoginScreen(),
+    //     ),
+    //   );
+    // });
     Future.delayed(
         Duration(
           milliseconds: 1500,
@@ -32,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         );
       }
-      // user is not loing
+      // user is not login
       else {
         Navigator.pushReplacement(
           context,

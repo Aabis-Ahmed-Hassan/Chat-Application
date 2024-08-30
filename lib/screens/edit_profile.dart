@@ -132,6 +132,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       _loading = false;
                     });
                     Utils.showSnackBar(context, 'Profile Updated Successfully');
+                    // the data on firebase  gets updated but to show the updated version on the app when we even the profile screen again,
+                    // we need to call this function
+                    FirebaseInstances.getSelfData();
                     Navigator.pop(context);
                   }).catchError((e) {
                     setState(() {

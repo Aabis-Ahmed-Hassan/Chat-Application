@@ -49,6 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
         // close circular progress indicator in the dialogue box
         Navigator.pop(context);
 
+        print('current user uid' + FirebaseInstances.auth.currentUser!.uid);
+        print('current user uid' +
+            FirebaseInstances.auth.currentUser!.displayName.toString());
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -59,6 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
         FirebaseInstances.createUser().then((e) {
           // close circular progress indicator in the dialogue box
           Navigator.pop(context);
+          print('current user uid ' + FirebaseInstances.auth.currentUser!.uid);
+          print('current user uid ' +
+              FirebaseInstances.auth.currentUser!.displayName.toString());
 
           Navigator.pushReplacement(
             context,

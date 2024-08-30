@@ -3,9 +3,12 @@ import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../components/chat_card.dart';
 import '../models/ChatUser.dart';
+import '../utils/utils.dart';
+import 'auth/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -16,6 +19,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<ChatUser> list = [];
+  late String image;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseInstances.getSelfData();
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -24,7 +35,23 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            await FirebaseInstances.auth.signOut().then((value) async {
+              await GoogleSignIn().signOut().then((value) {
+                // to clear the stack
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                );
+              }).catchError((e) {
+                Utils.showSnackBar(context, 'Sign out fail!');
+              });
+            }).catchError((e) {
+              Utils.showSnackBar(context, 'Sign out fail!');
+            });
+          },
           icon: Icon(
             CupertinoIcons.home,
           ),
@@ -38,14 +65,17 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditProfileScreen(currentUser: list[0]),
+                  builder: (context) =>
+                      EditProfileScreen(currentUser: FirebaseInstances.me),
                 ),
               );
             },
             child: CircleAvatar(
+              // backgroundImage: NetworkImage(list.isEmpty
+              //     ? 'https://cdn-icons-png.flaticon.com/128/149/149071.png'
+              //     : list[0].image!),
               backgroundImage: NetworkImage(
-                list[0].image ??
-                    'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                'https://cdn-icons-png.flaticon.com/128/149/149071.png',
               ),
             ),
           ),
@@ -55,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseInstances.firestore.collection('users').snapshots(),
+        stream: FirebaseInstances.getAllUsersExceptSelf(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -72,18 +102,18 @@ class _HomeScreenState extends State<HomeScreen> {
             for (QueryDocumentSnapshot<Map<String, dynamic>> i in data) {
               list.add(ChatUser.fromJson(i.data()));
             }
-
             return ListView.builder(
               // itemCount: snapshot.data!.docs.length,
               itemCount: list.length,
               physics: BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                // if (FirebaseInstances.currentUser.uid !=
-                //     snapshot.data!.docs[index].get('id'))
                 return ChatCard(
                   // user: ChatUser.fromJson(snapshot.data!.docs[index].data()),
                   user: list[index],
                 );
+
+                // if (FirebaseInstances.currentUser.uid != list[index].id) {
+                // }
               },
             );
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
