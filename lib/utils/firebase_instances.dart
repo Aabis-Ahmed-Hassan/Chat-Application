@@ -66,8 +66,7 @@ class FirebaseInstances {
     });
   }
 
-  static Future<void> updateProfile(
-      BuildContext context, String name, String about) async {
+  static Future<void> updateProfile(BuildContext context) async {
     print('name ' + me.name.toString());
     print('about ' + me.about.toString());
     print('id ' + me.id.toString());
@@ -76,13 +75,13 @@ class FirebaseInstances {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .update({
-      'name': name,
-      'about': about,
+      'name': me.name,
+      'about': me.about,
     }).then((e) {
       Utils.showSnackBar(context, 'Profile Updated Successfully');
       // // the data on firebase  gets updated but to show the updated version on the app when we even the profile screen again,
       // // we need to call this function
-      FirebaseInstances.getSelfData();
+      // FirebaseInstances.getSelfData();
     }).catchError((e) {
       Utils.showSnackBar(context, 'An Error Occurred');
     });

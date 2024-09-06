@@ -105,14 +105,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       children: [
                         // name text field
                         TextFormField(
-                          // onSaved: (value) {
-                          //   FirebaseInstances.me.name = value;
-                          // },
-                          validator: (value) {
-                            if (value!.isEmpty || value == null) {
-                              return 'Required field';
-                            }
+                          onSaved: (value) {
+                            FirebaseInstances.me.name = value ?? '';
                           },
+                          validator: (value) => value!.isEmpty || value == null
+                              ? 'Required Field'
+                              : null
+                          // {
+                          //
+                          //   if (value!.isEmpty || value == null) {
+                          //     return 'Required field';
+                          //   }
+                          //
+                          // },
+                          ,
                           decoration: InputDecoration(
                             label: Text('Name'),
                             hintText: 'e.g. Ali',
@@ -150,11 +156,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             });
 
                             if (_formKey.currentState!.validate()) {
-                              print('form key validate');
+                              _formKey.currentState!.save();
                               FirebaseInstances.updateProfile(
                                 context,
-                                _nameController.text.toString(),
-                                _aboutController.text.toString(),
                               ).then((e) {
                                 Navigator.pop(context);
                               });
