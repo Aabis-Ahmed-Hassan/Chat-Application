@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatapplication/models/ChatUser.dart';
+import 'package:chatapplication/screens/chat_screen.dart';
 import 'package:chatapplication/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,16 @@ class ChatCard extends StatelessWidget {
       elevation: 1,
       color: Colors.white,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                user: user,
+              ),
+            ),
+          );
+        },
         child: ListTile(
           leading: CircleAvatar(
             child: ClipRRect(
