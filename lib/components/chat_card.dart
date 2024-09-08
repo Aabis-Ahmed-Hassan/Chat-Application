@@ -27,6 +27,7 @@ class ChatCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(width / 2),
               child: CachedNetworkImage(
+                fit: BoxFit.cover,
                 imageUrl: user.image ??
                     'https://cdn-icons-png.flaticon.com/128/149/149071.png',
                 placeholder: (context, url) {
@@ -43,7 +44,7 @@ class ChatCard extends StatelessWidget {
           title: Text(
             user.name.toString(),
           ),
-          subtitle: Text(user.id.toString()),
+          subtitle: Text(user.email.toString()),
           trailing: Random().nextInt(2) % 2 == 0
               ? Container(
                   height: height * .02,

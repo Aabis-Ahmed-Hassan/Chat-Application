@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/screens/auth/login_screen.dart';
@@ -6,6 +8,7 @@ import 'package:chatapplication/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   EditProfileScreen({super.key, required this.currentUser});
@@ -22,6 +25,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   final _formKey = GlobalKey<FormState>();
   bool _loading = false;
+  String? imageAddress;
+  ImagePicker _imagePicker = ImagePicker();
   @override
   void initState() {
     // TODO: implement initState
@@ -36,6 +41,73 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
     _nameController.dispose();
     _aboutController.dispose();
+  }
+
+  void showBottomSheetForPickingImage(double height) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        XFile? image = await _imagePicker.pickImage(
+                            source: ImageSource.gallery);
+                        if (image != null) {
+                          print(image.path);
+
+                          imageAddress = image.path;
+                          setState(() {});
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          Image(
+                            height: height * 0.05,
+                            // fit: BoxFit.cover,
+                            image: AssetImage('assets/add_image.png'),
+                          ),
+                          Text('Pick from Gallery'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        XFile? image = await _imagePicker.pickImage(
+                            source: ImageSource.camera);
+                        if (image != null) {
+                          imageAddress = image.path;
+                          setState(() {});
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          Image(
+                            height: height * 0.05,
+                            // fit: BoxFit.cover,
+                            image: AssetImage('assets/camera.png'),
+                          ),
+                          Text('Capture'),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -65,21 +137,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(width / 2),
-                        child: CachedNetworkImage(
-                          height: width * .4,
-                          width: width * .4,
-                          fit: BoxFit.fill,
-                          imageUrl: widget.currentUser.image ??
-                              'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-                          placeholder: (context, url) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
-                          errorWidget: (context, url, error) {
-                            return Icon(CupertinoIcons.person);
-                          },
-                        ),
+                        child: imageAddress == null
+                            ? CachedNetworkImage(
+                                height: width * .4,
+                                width: width * .4,
+                                fit: BoxFit.cover,
+                                imageUrl: widget.currentUser.image ??
+                                    'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                                placeholder: (context, url) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                },
+                                errorWidget: (context, url, error) {
+                                  return Icon(CupertinoIcons.person);
+                                },
+                              )
+                            : Image(
+                                height: width * .4,
+                                width: width * .4,
+                                fit: BoxFit.cover,
+                                image: FileImage(
+                                  File(imageAddress!),
+                                ),
+                              ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -87,7 +168,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: MaterialButton(
                           color: Colors.white,
                           shape: CircleBorder(),
-                          onPressed: () {},
+                          onPressed: () {
+                            showBottomSheetForPickingImage(height);
+                          },
                           child: Icon(
                             Icons.edit,
                           ),
@@ -157,16 +240,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              FirebaseInstances.updateProfile(
-                                context,
-                              ).then((e) {
-                                Navigator.pop(context);
-                              });
+
+                              // if the user has not changed the image at once,
+                              //  then the variable imageAddress will remain null.
+                              // and this function will not be called
+
+                              if (imageAddress != null) {
+                                FirebaseInstances.updateProfilePicture(
+                                        File(imageAddress!), context)
+                                    .then((e) {
+                                  Navigator.pop(context);
+                                });
+                              } else {
+                                FirebaseInstances.updateProfile(
+                                  context,
+                                ).then((e) {
+                                  Navigator.pop(context);
+                                });
+                              }
                             }
                             setState(() {
                               _loading = false;
                             });
-                            ;
                           },
                           child: _loading
                               ? Center(

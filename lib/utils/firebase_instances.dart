@@ -1,14 +1,20 @@
+import 'dart:io';
+
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 
 class FirebaseInstances {
   static FirebaseAuth auth = FirebaseAuth.instance;
+
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
   static User currentUser = FirebaseAuth.instance.currentUser!;
-// check if user already exists
+
+  static FirebaseStorage storage = FirebaseStorage.instance;
+  // check if user already exists
   static Future<bool> userExistence() async {
     return (await FirebaseFirestore.instance
             .collection('users')
@@ -77,6 +83,7 @@ class FirebaseInstances {
         .update({
       'name': me.name,
       'about': me.about,
+      'image': me.image,
     }).then((e) {
       Utils.showSnackBar(context, 'Profile Updated Successfully');
       // // the data on firebase  gets updated but to show the updated version on the app when we even the profile screen again,
@@ -85,5 +92,16 @@ class FirebaseInstances {
     }).catchError((e) {
       Utils.showSnackBar(context, 'An Error Occurred');
     });
+  }
+
+  static Future<void> updateProfilePicture(
+      File file, BuildContext context) async {
+    Reference ref = storage.ref().child('profile_pictures/${file.path}');
+
+    TaskSnapshot uploadTask = await ref.putFile(file);
+    String downloadUrl = await ref.getDownloadURL();
+
+    me.image = downloadUrl;
+    updateProfile(context);
   }
 }
