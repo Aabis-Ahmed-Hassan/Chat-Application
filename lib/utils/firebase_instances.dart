@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chatapplication/models/ChatUser.dart';
+import 'package:chatapplication/models/single_message_modal.dart';
 import 'package:chatapplication/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -103,5 +104,36 @@ class FirebaseInstances {
 
     me.image = downloadUrl;
     updateProfile(context);
+  }
+
+  // static Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+  //     getAllMessages() async {
+  //   return firestore.collection('messages').snapshots();
+  // }
+
+  static String getConversationId(String id) {
+    return auth.currentUser!.uid.hashCode <= id.hashCode
+        ? '${auth.currentUser!.uid}_$id'
+        : '${id}_${auth.currentUser!.uid}';
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(String id) {
+    String conversationId = getConversationId(id);
+    return firestore.collection('chats/$conversationId/messages/').snapshots();
+  }
+
+  static Future<void> sendMessage(String textMessage, ChatUser user) async {
+    String time = DateTime.now().millisecondsSinceEpoch.toString();
+    SingleMessageModal messageToUpload = SingleMessageModal(
+      type: 'Text',
+      sentTime: time,
+      senderId: auth.currentUser!.uid,
+      receiverId: user.id,
+      receivedTime: '',
+      message: textMessage,
+    );
+    var ref =
+        firestore.collection('chats/${getConversationId(user.id!)}/messages/');
+    await ref.doc(time).set(messageToUpload.toJson());
   }
 }
