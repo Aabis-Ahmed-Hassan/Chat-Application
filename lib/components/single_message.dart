@@ -1,4 +1,5 @@
 import 'package:chatapplication/models/single_message_modal.dart';
+import 'package:chatapplication/models/time_formatter_modal.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:flutter/material.dart';
 
@@ -53,12 +54,14 @@ class SingleMessage extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.double_arrow,
-                  color: Colors.blue,
-                  size: 16,
-                ),
-                Text(singleMessage.sentTime.toString()),
+                if (singleMessage.readTime!.isNotEmpty)
+                  Icon(
+                    Icons.double_arrow,
+                    color: Colors.blue,
+                    size: 16,
+                  ),
+                Text(TimeFormatterModal.format(
+                    singleMessage.sentTime!, context)),
                 Spacer(),
                 Container(
                   padding: EdgeInsets.symmetric(
@@ -78,36 +81,47 @@ class SingleMessage extends StatelessWidget {
               ],
             ),
           )
-        : Container(
-            margin: EdgeInsets.symmetric(
-              vertical: height * 0.025,
+        : ReceiverMessage(context);
+  }
+
+  Widget ReceiverMessage(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
+    if (singleMessage.readTime == '') {
+      FirebaseInstances.updateReadMessageTime(singleMessage);
+    }
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: height * 0.025,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(
+                horizontal: width * 0.02, vertical: height * 0.01),
+            decoration: BoxDecoration(
+              color: Colors.purple.shade200,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: width * 0.02, vertical: height * 0.01),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.shade200,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Text(
-                    singleMessage.message.toString(),
-                  ),
-                ),
-                Spacer(),
-                Text(singleMessage.sentTime.toString()),
-                Icon(
-                  Icons.double_arrow,
-                  color: Colors.blue,
-                  size: 16,
-                ),
-              ],
+            child: Text(
+              singleMessage.message.toString(),
             ),
-          );
+          ),
+          Spacer(),
+          Text(TimeFormatterModal.format(singleMessage.sentTime!, context)),
+          // Icon(
+          //   Icons.double_arrow,
+          //   color: Colors.blue,
+          //   size: 16,
+          // ),
+        ],
+      ),
+    );
   }
 }

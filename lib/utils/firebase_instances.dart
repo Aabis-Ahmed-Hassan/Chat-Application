@@ -129,11 +129,20 @@ class FirebaseInstances {
       sentTime: time,
       senderId: auth.currentUser!.uid,
       receiverId: user.id,
-      receivedTime: '',
+      readTime: '',
       message: textMessage,
     );
     var ref =
         firestore.collection('chats/${getConversationId(user.id!)}/messages/');
     await ref.doc(time).set(messageToUpload.toJson());
+  }
+
+  static Future<void> updateReadMessageTime(SingleMessageModal message) async {
+    String id = message.sentTime ?? '';
+    var ref = firestore
+        .collection('chats/${getConversationId(message.receiverId!)}/messages');
+    await ref
+        .doc(id)
+        .update({'readTime': DateTime.now().millisecondsSinceEpoch.toString()});
   }
 }
