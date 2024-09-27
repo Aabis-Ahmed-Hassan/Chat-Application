@@ -20,6 +20,7 @@ class ChatUser {
       this.pushToken,
       this.email});
 
+
   ChatUser.fromJson(Map<String, dynamic> json) {
     image = json['image'] ?? 'Null Data';
     createdAt = json['createdAt'] ?? 'Null Data';

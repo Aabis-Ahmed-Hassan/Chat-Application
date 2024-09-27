@@ -15,14 +15,19 @@ class SingleMessageModal {
   String? receiverId;
   String? senderId;
   String? type;
+  String? docId;
+  String? conversationId;
 
-  SingleMessageModal(
-      {this.message,
-      this.sentTime,
-      this.readTime,
-      this.receiverId,
-      this.senderId,
-      this.type});
+  SingleMessageModal({
+    this.message,
+    this.sentTime,
+    this.readTime,
+    this.receiverId,
+    this.senderId,
+    this.type,
+    this.docId,
+    this.conversationId,
+  });
 
   SingleMessageModal.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -31,6 +36,8 @@ class SingleMessageModal {
     receiverId = json['receiverId'];
     senderId = json['senderId'];
     type = json['type'];
+    docId = json['docId'];
+    conversationId = json['conversationId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -41,6 +48,8 @@ class SingleMessageModal {
     data['receiverId'] = this.receiverId;
     data['senderId'] = this.senderId;
     data['type'] = this.type;
+    data['docId'] = this.docId;
+    data['conversationId'] = this.conversationId;
     return data;
   }
 }

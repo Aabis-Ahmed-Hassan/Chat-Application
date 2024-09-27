@@ -59,10 +59,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: InkWell(
                       onTap: () async {
                         XFile? image = await _imagePicker.pickImage(
-                            source: ImageSource.gallery);
+                            source: ImageSource.gallery, imageQuality: 50);
                         if (image != null) {
-                          print(image.path);
-
                           imageAddress = image.path;
                           setState(() {});
                           Navigator.pop(context);
@@ -84,7 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: InkWell(
                       onTap: () async {
                         XFile? image = await _imagePicker.pickImage(
-                            source: ImageSource.camera);
+                            source: ImageSource.camera, imageQuality: 50);
                         if (image != null) {
                           imageAddress = image.path;
                           setState(() {});
@@ -214,9 +212,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         // about text field
 
                         TextFormField(
-                          // onSaved: (value) {
-                          //   FirebaseInstances.me.about = value;
-                          // },
+                          onSaved: (value) {
+                            FirebaseInstances.me.about = value;
+                          },
                           validator: (value) {
                             if (value!.isEmpty || value == null) {
                               return 'Required field';

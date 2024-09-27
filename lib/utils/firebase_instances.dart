@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/models/single_message_modal.dart';
+import 'package:chatapplication/models/time_formatter_modal.dart';
 import 'package:chatapplication/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +16,7 @@ class FirebaseInstances {
   static User currentUser = FirebaseAuth.instance.currentUser!;
 
   static FirebaseStorage storage = FirebaseStorage.instance;
+
   // check if user already exists
   static Future<bool> userExistence() async {
     return (await FirebaseFirestore.instance
@@ -23,6 +25,7 @@ class FirebaseInstances {
             .get())
         .exists;
   }
+
 //   create a new user if it doesn't exist already
 // in this way, the document will not get clear on every login
 
@@ -56,9 +59,8 @@ class FirebaseInstances {
   }
 
   static late ChatUser me;
+
   static Future<void> getSelfData() async {
-    print('current user uid in get self data function ' +
-        FirebaseAuth.instance.currentUser!.uid);
     await firestore
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -69,7 +71,6 @@ class FirebaseInstances {
       } else {
         getSelfData();
       }
-      print('my data ${me.name}');
     });
   }
 
@@ -95,17 +96,6 @@ class FirebaseInstances {
     });
   }
 
-  static Future<void> updateProfilePicture(
-      File file, BuildContext context) async {
-    Reference ref = storage.ref().child('profile_pictures/${file.path}');
-
-    TaskSnapshot uploadTask = await ref.putFile(file);
-    String downloadUrl = await ref.getDownloadURL();
-
-    me.image = downloadUrl;
-    updateProfile(context);
-  }
-
   // static Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
   //     getAllMessages() async {
   //   return firestore.collection('messages').snapshots();
@@ -118,31 +108,102 @@ class FirebaseInstances {
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages(String id) {
-    String conversationId = getConversationId(id);
-    return firestore.collection('chats/$conversationId/messages/').snapshots();
+    return firestore
+        .collection('chats/${getConversationId(id)}/messages/')
+        .snapshots();
   }
 
-  static Future<void> sendMessage(String textMessage, ChatUser user) async {
+  static Future<void> sendMessage(
+      String textMessage, ChatUser user, String messageType) async {
     String time = DateTime.now().millisecondsSinceEpoch.toString();
+    print(time);
+    print(DateTime.now().day);
     SingleMessageModal messageToUpload = SingleMessageModal(
-      type: 'Text',
+      type: messageType,
       sentTime: time,
       senderId: auth.currentUser!.uid,
       receiverId: user.id,
       readTime: '',
       message: textMessage,
+      docId: time,
+      conversationId: getConversationId(user.id!),
     );
     var ref =
         firestore.collection('chats/${getConversationId(user.id!)}/messages/');
     await ref.doc(time).set(messageToUpload.toJson());
   }
 
-  static Future<void> updateReadMessageTime(SingleMessageModal message) async {
-    String id = message.sentTime ?? '';
-    var ref = firestore
-        .collection('chats/${getConversationId(message.receiverId!)}/messages');
-    await ref
-        .doc(id)
-        .update({'readTime': DateTime.now().millisecondsSinceEpoch.toString()});
+  static Future<void> updateReadMessageTime(
+      SingleMessageModal message, BuildContext context) async {
+    String readTime = TimeFormatterModal.format(
+        DateTime.now().millisecondsSinceEpoch.toString(), context);
+    var ref2 =
+        firestore.collection('chats/${message.conversationId}/messages/');
+    await ref2.doc(message.sentTime).update({'readTime': '$readTime'});
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessages(
+      String id) {
+    return firestore
+        .collection('chats/${getConversationId(id)}/messages/')
+        .orderBy('sentTime', descending: true)
+        .limit(1)
+        .snapshots();
+  }
+
+  static Future<void> updateProfilePicture(
+      File file, BuildContext context) async {
+    String extension = file.path.split('.').last;
+    Reference ref = FirebaseStorage.instance.ref().child(
+        'profile_pictures/${FirebaseAuth.instance.currentUser!.uid}.$extension}');
+    await ref.putFile(file, SettableMetadata(contentType: 'image/$extension'));
+    String imageUrl = await ref.getDownloadURL();
+    me.image = imageUrl;
+    updateProfile(context);
+
+    //
+    // String fileName = basename(file.path);
+    // Reference ref = storage.ref().child('profile_pictures/${fileName}');
+    // Reference ref = storage.ref().child('profile_pictures/${file.path}');
+    //
+    // TaskSnapshot uploadTask = await ref.putFile(file);
+    // String downloadUrl = await ref.getDownloadURL();
+    //
+    // me.image = downloadUrl;
+    // updateProfile(context);
+  }
+
+  static Future<void> sendImageMessage(ChatUser user, File file) async {
+    final extension = file.path.split('.').last;
+
+    Reference ref = FirebaseStorage.instance.ref().child(
+        'images/${getConversationId(user.id!)}/${DateTime.now().millisecondsSinceEpoch.toString()}/$extension');
+    await ref.putFile(
+      file,
+      SettableMetadata(contentType: 'image/$extension'),
+    );
+
+    String downloadUrl = await ref.getDownloadURL();
+
+    await sendMessage(downloadUrl, user, 'image');
+
+    // final ext = file.path.split('.').last;
+    // final ref = storage.ref().child(
+    //     'images/${getConversationId(user.id!)}/${DateTime.now().millisecondsSinceEpoch.toString()}.$ext');
+    //
+    // await ref
+    //     .putFile(file, SettableMetadata(contentType: 'image/$ext'))
+    //     .then((e) {
+    //   print('data transferred : ${e.bytesTransferred / 1000} kb');
+    // });
+    //
+    // final imageUrl = await ref.getDownloadURL();
+    // await sendMessage(imageUrl, user, 'image');
+  }
+
+  static Future<void> deleteMessage(SingleMessageModal message) async {
+    var ref =
+        await firestore.collection('chats/${message.conversationId}/messages/');
+    await ref.doc(message.docId).delete();
   }
 }
