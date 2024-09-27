@@ -153,8 +153,9 @@ class ChatCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(width),
                               ),
                             )
-                          : Text(TimeFormatterModal.format2(
-                              lastMessage!.sentTime!, context) ),
+                          : Text(
+                              TimeFormatterModal.formatForMessageTimeOnChatCard(
+                                  lastMessage!.sentTime!, context)),
 
                   // Container(
                   //   height: height * .02,

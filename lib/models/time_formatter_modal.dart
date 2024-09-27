@@ -7,7 +7,8 @@ class TimeFormatterModal {
     return TimeOfDay.fromDateTime(time).format(context);
   }
 
-  static String format2(String time, BuildContext context) {
+  static String formatForMessageTimeOnChatCard(
+      String time, BuildContext context) {
     DateTime inputTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
     DateTime currentTime = DateTime.now();
     String formattedTime = TimeOfDay.fromDateTime(inputTime).format(context);
@@ -20,6 +21,25 @@ class TimeFormatterModal {
     return inputTime.year == currentTime.year
         ? '$formattedTime - ${inputTime.day} ${getMonth(inputTime)}'
         : '$formattedTime - ${inputTime.day} ${getMonth(inputTime)} ${inputTime.year}';
+  }
+
+  static String formatForProfileLastSeenAtChatScreen(
+      String time, BuildContext context) {
+    DateTime inputTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+    DateTime currentTime = DateTime.now();
+    String formattedTime = TimeOfDay.fromDateTime(inputTime).format(context);
+    if (currentTime.year == inputTime.year &&
+        currentTime.month == inputTime.month &&
+        currentTime.day == inputTime.day) {
+      return 'Last Seen Today at  $formattedTime';
+    }
+
+    // yesterday
+    else if ((currentTime.difference(inputTime).inHours / 24).round() == 1) {
+      return 'Last Seen Yesterday at $formattedTime';
+    } else {
+      return 'Last seen at $formattedTime on ${inputTime.day} ${getMonth(inputTime)}';
+    }
   }
 
   static String getMonth(DateTime time) {

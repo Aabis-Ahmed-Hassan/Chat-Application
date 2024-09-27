@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatapplication/components/single_message.dart';
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/models/single_message_modal.dart';
+import 'package:chatapplication/models/time_formatter_modal.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -107,14 +108,29 @@ class _ChatScreenState extends State<ChatScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
-                    widget.user.lastActive ?? 'Last seen at 12:00 am',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: FirebaseInstances.getUserLastSeen(
+                        widget.user,
+                      ),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Container();
+                        } else {
+                          List _list = snapshot.data!.docs;
+                          ChatUser user = ChatUser.fromJson(_list[0].data());
+                          return user.isOnline!
+                              ? Text('Online')
+                              : Text(
+                                  '${TimeFormatterModal.formatForProfileLastSeenAtChatScreen(user.lastActive.toString(), context)}' ??
+                                      'No last seen',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey,
+                                  ),
+                                );
+                        }
+                      }),
                 ],
               ),
             ],

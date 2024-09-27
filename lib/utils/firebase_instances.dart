@@ -37,7 +37,7 @@ class FirebaseInstances {
       email: currentUser.email.toString(),
       id: currentUser.uid,
       isOnline: false,
-      lastActive: '12:02',
+      lastActive: DateTime.now().millisecondsSinceEpoch.toString(),
       name: currentUser.displayName.toString(),
       pushToken: 'push token',
     );
@@ -205,5 +205,20 @@ class FirebaseInstances {
     var ref =
         await firestore.collection('chats/${message.conversationId}/messages/');
     await ref.doc(message.docId).delete();
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getUserLastSeen(
+      ChatUser user) {
+    return firestore
+        .collection('users')
+        .where('id', isEqualTo: user.id)
+        .snapshots();
+  }
+
+  static Future<void> updateMyLastSeen(bool isOnline) async {
+    await firestore.collection('users').doc(currentUser.uid!).update({
+      'isOnline': isOnline,
+      'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
+    });
   }
 }
