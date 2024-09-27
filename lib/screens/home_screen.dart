@@ -3,6 +3,7 @@ import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../components/chat_card.dart';
@@ -28,6 +29,20 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     FirebaseInstances.getSelfData();
+    //   update the user status to active
+    FirebaseInstances.updateMyLastSeen(true);
+    // update user's online/offline status
+    SystemChannels.lifecycle.setMessageHandler((message) {
+      //   make the user status to online
+      if (message.toString().contains('resume')) {
+        FirebaseInstances.updateMyLastSeen(true);
+      }
+      // make the user status to offline
+      if (message.toString().contains('pause')) {
+        FirebaseInstances.updateMyLastSeen(false);
+      }
+      return Future.value(message);
+    });
   }
 
   @override
