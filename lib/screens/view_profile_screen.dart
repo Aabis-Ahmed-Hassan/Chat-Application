@@ -24,6 +24,7 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
+        // showing empty appbar so that back icon will be shown
         appBar: AppBar(),
         body: Center(
           child: Padding(

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatapplication/components/profile_details_dialog.dart';
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/models/single_message_modal.dart';
 import 'package:chatapplication/models/time_formatter_modal.dart';
@@ -61,21 +62,30 @@ class ChatCard extends StatelessWidget {
                   !snapshot.hasData ||
                   snapshot.data == null) {
                 return ListTile(
-                  leading: CircleAvatar(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(width / 2),
-                      child: CachedNetworkImage(
-                        fit: BoxFit.cover,
-                        imageUrl: user.image ??
-                            'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-                        placeholder: (context, url) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        errorWidget: (context, url, error) {
-                          return Icon(CupertinoIcons.person);
-                        },
+                  leading: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ProfileDetailsDialog(user: user);
+                          });
+                    },
+                    child: CircleAvatar(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(width / 2),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: user.image ??
+                              'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                          placeholder: (context, url) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return Icon(CupertinoIcons.person);
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -104,21 +114,30 @@ class ChatCard extends StatelessWidget {
                   lastMessage = SingleMessageModal.fromJson(i.data());
                 }
                 return ListTile(
-                  leading: CircleAvatar(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(width / 2),
-                      child: CachedNetworkImage(
-                        fit: BoxFit.cover,
-                        imageUrl: user.image ??
-                            'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-                        placeholder: (context, url) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        errorWidget: (context, url, error) {
-                          return Icon(CupertinoIcons.person);
-                        },
+                  leading: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ProfileDetailsDialog(user: user);
+                          });
+                    },
+                    child: CircleAvatar(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(width / 2),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: user.image ??
+                              'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                          placeholder: (context, url) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return Icon(CupertinoIcons.person);
+                          },
+                        ),
                       ),
                     ),
                   ),
