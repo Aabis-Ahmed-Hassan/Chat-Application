@@ -142,10 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () async {
                   await FirebaseInstances.getSelfInformation();
 
-                  // print("simple variable : ${FirebaseInstances.me}");
-                  // print("name: ${FirebaseInstances.me.name}");
-                  // print("about : ${FirebaseInstances.me.about}");
-                  // print("id: ${FirebaseInstances.me.id}");
                   Navigator.push(
                     context,
                     MaterialPageRoute(

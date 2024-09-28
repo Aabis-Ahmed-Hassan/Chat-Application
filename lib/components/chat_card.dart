@@ -125,21 +125,88 @@ class ChatCard extends StatelessWidget {
                   title: Text(
                     user.name.toString(),
                   ),
-                  subtitle: lastMessage == null
-                      ? Text(user.about ?? 'Send him a Message!')
-                      : lastMessage!.type == 'text'
-                          ? Text(lastMessage!.message.toString())
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.image,
-                                  size: 16,
+                  subtitle:
+                      // if there is no message between these two users, simple show the about of one to the other
+
+                      lastMessage == null
+                          ? Text(user.about ?? 'Send him a Message!')
+                          // but if they've conversed, then show the latest message
+                          // and discriminate the UI depending upon the type of last  message i.e, image or text
+                          : lastMessage!.type == 'text'
+                              //     if the last message is a text, show this
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // show blue/grey icon to the sender and hide the icon from the receiver
+                                    if (lastMessage!.senderId ==
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                      Icon(
+                                        Icons.done_all,
+                                        color: lastMessage!.readTime!.isNotEmpty
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                        size: 17,
+                                      ),
+                                    // hide the space if we don't have to show the icon
+                                    if (lastMessage!.senderId ==
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                      SizedBox(
+                                        width: width * 0.01,
+                                      ),
+                                    Text(lastMessage!.message.toString()),
+                                  ],
+                                )
+                              // and if the last message is an image, show this
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // show blue/grey icon to the sender and hide the icon from the receiver
+                                    if (lastMessage!.senderId ==
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                      Icon(
+                                        Icons.done_all,
+                                        color: lastMessage!.readTime!.isNotEmpty
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                        size: 17,
+                                      ),
+                                    // hide the space if we don't have to show the icon
+                                    if (lastMessage!.senderId ==
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                      SizedBox(
+                                        width: width * 0.01,
+                                      ),
+
+                                    SizedBox(
+                                      width: width * 0.01,
+                                    ),
+                                    Icon(
+                                      Icons.image,
+                                      size: 16,
+                                    ),
+                                    SizedBox(
+                                      width: width * 0.01,
+                                    ),
+                                    Text('Photo'),
+                                  ],
                                 ),
-                                Text(' Photo'),
-                              ],
-                            ),
+                  // subtitle: lastMessage == null
+                  //     ? Text(user.about ?? 'Send him a Message!')
+                  //     : lastMessage!.type == 'text'
+                  //         ? Text(lastMessage!.message.toString())
+                  //         : Row(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.center,
+                  //             children: [
+                  //               Icon(
+                  //                 Icons.image,
+                  //                 size: 16,
+                  //               ),
+                  //               Text(' Photo'),
+                  //             ],
+                  //           ),
                   trailing: lastMessage == null
                       ? null
                       : lastMessage!.readTime!.isEmpty &&

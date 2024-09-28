@@ -222,7 +222,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         InkWell(
                           onTap: () {
                             setState(() {
-                              print('show emoji is tapped');
                               FocusScope.of(context).unfocus();
                               _showEmojis = !_showEmojis;
                             });

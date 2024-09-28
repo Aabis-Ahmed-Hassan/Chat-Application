@@ -30,7 +30,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    FirebaseInstances.printAllInformation();
+    // FirebaseInstances.printAllInformation();
+    // FirebaseInstances.me.id = FirebaseInstances.auth.currentUser!.uid;
+    // FirebaseInstances.me.name = FirebaseInstances.auth.currentUser!.displayName;
+    // FirebaseInstances.me.image = FirebaseInstances.auth.currentUser!.photoURL;
+    // FirebaseInstances.me.email = FirebaseInstances.auth.currentUser!.email;
     super.initState();
     _nameController.text = widget.currentUser.name ?? 'Null Name';
     _aboutController.text = widget.currentUser.about ?? 'Null About';
@@ -298,6 +302,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                 // to clear the stack
 
+                // FirebaseInstances.me = ChatUser();
                 Navigator.pop(context);
                 // reinstantiating the auth method so that after signing in again, we'll not be using details of previous user
                 // FirebaseInstances.auth = FirebaseAuth.instance;

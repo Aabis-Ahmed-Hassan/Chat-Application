@@ -37,21 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
   _login() async {
     Utils.showProgressBar(context);
     await signInWithGoogle().then((value) async {
-      // print(value!.user);
-      // print('\n\n');
-      //
-      // print(value!.credential);
-      // print('\n\n');
-      // print(value.additionalUserInfo);
-      // print('\n\n');
-
       if (await FirebaseInstances.userExistence()) {
         // close circular progress indicator in the dialogue box
         Navigator.pop(context);
 
-        print('current user uid' + FirebaseInstances.auth.currentUser!.uid);
-        print('current user name' +
-            FirebaseInstances.auth.currentUser!.displayName.toString());
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -62,9 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
         FirebaseInstances.createUser().then((e) {
           // close circular progress indicator in the dialogue box
           Navigator.pop(context);
-          print('current user uid ' + FirebaseInstances.auth.currentUser!.uid);
-          print('current user uid ' +
-              FirebaseInstances.auth.currentUser!.displayName.toString());
 
           Navigator.pushReplacement(
             context,
@@ -88,7 +74,6 @@ class _LoginScreenState extends State<LoginScreen> {
           accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
       return await FirebaseAuth.instance.signInWithCredential(credentials);
     } catch (e) {
-      print('signInWithGoogle: $e');
       Utils.showSnackBar(context, 'An error occured (${e.toString()})');
       return null;
     }

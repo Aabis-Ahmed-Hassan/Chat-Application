@@ -30,22 +30,38 @@ class FirebaseInstances {
 // in this way, the document will not get clear on every login
 
   static Future<void> createUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
     ChatUser newUser = ChatUser(
-      image: currentUser.photoURL.toString(),
+      image: user!.photoURL.toString(),
       about: 'I am using chat app',
       createdAt: DateTime.now().millisecondsSinceEpoch.toString(),
-      email: currentUser.email.toString(),
-      id: currentUser.uid,
-      isOnline: false,
+      email: user!.email.toString(),
+      id: user!.uid,
+      isOnline: true,
       lastActive: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: currentUser.displayName.toString(),
+      name: user!.displayName.toString(),
       pushToken: 'push token',
     );
+    // ChatUser newUser = ChatUser(
+    //   image: currentUser.photoURL.toString(),
+    //   about: 'I am using chat app',
+    //   createdAt: DateTime.now().millisecondsSinceEpoch.toString(),
+    //   email: currentUser.email.toString(),
+    //   id: currentUser.uid,
+    //   isOnline: true,
+    //   lastActive: DateTime.now().millisecondsSinceEpoch.toString(),
+    //   name: currentUser.displayName.toString(),
+    //   pushToken: 'push token',
+    // );
 
     await FirebaseInstances.firestore
         .collection('users')
-        .doc(currentUser.uid)
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .set(newUser.toJson());
+    // await FirebaseInstances.firestore
+    //     .collection('users')
+    // .doc(currentUser.uid)
+    //     .set(newUser.toJson());
   }
 
   // static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsersExceptSelf() {
@@ -63,13 +79,15 @@ class FirebaseInstances {
   static Future<void> getSelfInformation() async {
     await firestore
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(auth.currentUser!.uid)
         .get()
         .then((user) async {
       if (user.exists) {
-        // print('aabis' + user['name'].toString());
+        print('if statement is called in getselfinformation function');
+
         me = ChatUser.fromJson(user.data()!);
       } else {
+        print('else statement is called in getselfinformation function');
         await createUser().then((value) {
           getSelfInformation();
         });
@@ -78,10 +96,6 @@ class FirebaseInstances {
   }
 
   static Future<void> updateProfile(BuildContext context) async {
-    print('name ' + me.name.toString());
-    print('about ' + me.about.toString());
-    print('id ' + me.id.toString());
-
     await firestore
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -119,8 +133,6 @@ class FirebaseInstances {
   static Future<void> sendMessage(
       String textMessage, ChatUser user, String messageType) async {
     String time = DateTime.now().millisecondsSinceEpoch.toString();
-    print(time);
-    print(DateTime.now().day);
     SingleMessageModal messageToUpload = SingleMessageModal(
       type: messageType,
       sentTime: time,
@@ -189,19 +201,6 @@ class FirebaseInstances {
     String downloadUrl = await ref.getDownloadURL();
 
     await sendMessage(downloadUrl, user, 'image');
-
-    // final ext = file.path.split('.').last;
-    // final ref = storage.ref().child(
-    //     'images/${getConversationId(user.id!)}/${DateTime.now().millisecondsSinceEpoch.toString()}.$ext');
-    //
-    // await ref
-    //     .putFile(file, SettableMetadata(contentType: 'image/$ext'))
-    //     .then((e) {
-    //   print('data transferred : ${e.bytesTransferred / 1000} kb');
-    // });
-    //
-    // final imageUrl = await ref.getDownloadURL();
-    // await sendMessage(imageUrl, user, 'image');
   }
 
   static Future<void> deleteMessage(SingleMessageModal message) async {
@@ -223,16 +222,5 @@ class FirebaseInstances {
       'isOnline': isOnline,
       'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
     });
-  }
-
-  static void printAllInformation() {
-    print(' FirebaseInstances.auth.currentUser!.uid => ' +
-        FirebaseInstances.auth.currentUser!.uid);
-    print('FirebaseInstances.auth.currentUser!.displayName.toString() => ' +
-        FirebaseInstances.auth.currentUser!.displayName.toString());
-    print('FirebaseInstances.me.id.toString() => ' +
-        FirebaseInstances.me.id.toString());
-    print('FirebaseInstances.me.name.toString() => ' +
-        FirebaseInstances.me.name.toString());
   }
 }

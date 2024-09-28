@@ -92,7 +92,7 @@ class SingleMessage extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.double_arrow,
+              Icons.done_all,
               color: singleMessage.readTime!.isNotEmpty
                   ? Colors.blue
                   : Colors.grey,
@@ -150,7 +150,6 @@ class SingleMessage extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
 
     if (singleMessage.readTime!.isEmpty) {
-      print(singleMessage.message);
       FirebaseInstances.updateReadMessageTime(singleMessage, context);
     }
 
