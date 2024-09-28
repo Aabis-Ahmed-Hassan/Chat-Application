@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pop(context);
 
         print('current user uid' + FirebaseInstances.auth.currentUser!.uid);
-        print('current user uid' +
+        print('current user name' +
             FirebaseInstances.auth.currentUser!.displayName.toString());
         Navigator.pushReplacement(
           context,

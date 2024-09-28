@@ -5,6 +5,7 @@ import 'package:chatapplication/components/single_message.dart';
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/models/single_message_modal.dart';
 import 'package:chatapplication/models/time_formatter_modal.dart';
+import 'package:chatapplication/screens/view_profile_screen.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -52,88 +53,100 @@ class _ChatScreenState extends State<ChatScreen> {
         appBar: AppBar(
           centerTitle: false,
           automaticallyImplyLeading: false,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // go back button
-              InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              // CircleAvatar(
-              //   backgroundImage: NetworkImage(
-              //     user.image ??
-              //         'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-              //   ),
-              // ),
-              // profile image
-              CircleAvatar(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(width / 2),
-                  child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    imageUrl: widget.user.image ??
-                        'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-                    placeholder: (context, url) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    },
-                    errorWidget: (context, url, error) {
-                      return Icon(CupertinoIcons.person);
-                    },
+          title: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewProfileScreen(
+                    currentUser: widget.user,
                   ),
                 ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              // profile details
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.user.name ?? 'No name',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // go back button
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_new_outlined,
+                  ),
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                // CircleAvatar(
+                //   backgroundImage: NetworkImage(
+                //     user.image ??
+                //         'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                //   ),
+                // ),
+                // profile image
+                CircleAvatar(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(width / 2),
+                    child: CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: widget.user.image ??
+                          'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                      placeholder: (context, url) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                      errorWidget: (context, url, error) {
+                        return Icon(CupertinoIcons.person);
+                      },
                     ),
                   ),
-                  StreamBuilder(
-                      stream: FirebaseInstances.getUserLastSeen(
-                        widget.user,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                // profile details
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.user.name ?? 'No name',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
                       ),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Container();
-                        } else {
-                          List _list = snapshot.data!.docs;
-                          ChatUser user = ChatUser.fromJson(_list[0].data());
-                          return user.isOnline!
-                              ? Text('Online')
-                              : Text(
-                                  '${TimeFormatterModal.formatForProfileLastSeenAtChatScreen(user.lastActive.toString(), context)}' ??
+                    ),
+                    StreamBuilder(
+                        stream: FirebaseInstances.getUserLastSeen(
+                          widget.user,
+                        ),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Container();
+                          } else {
+                            List _list = snapshot.data!.docs;
+                            ChatUser user = ChatUser.fromJson(_list[0].data());
+                            return Text(
+                              user.isOnline!
+                                  ? 'Online'
+                                  : 'Last Seen at ${TimeFormatterModal.formatForProfileLastSeenAtChatScreen(user.lastActive.toString(), context)}' ??
                                       'No last seen',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                        }
-                      }),
-                ],
-              ),
-            ],
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.grey,
+                              ),
+                            );
+                          }
+                        }),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         body: Padding(

@@ -1,6 +1,6 @@
-import 'package:chatapplication/screens/edit_profile.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +10,7 @@ import '../components/chat_card.dart';
 import '../models/ChatUser.dart';
 import '../utils/utils.dart';
 import 'auth/login_screen.dart';
+import 'edit_profile.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -24,22 +25,28 @@ class _HomeScreenState extends State<HomeScreen> {
   late String image;
   bool isSearching = false;
   TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    FirebaseInstances.getSelfData();
+    FirebaseInstances.getSelfInformation();
+    // FirebaseInstances.printAllInformation();
     //   update the user status to active
     FirebaseInstances.updateMyLastSeen(true);
     // update user's online/offline status
     SystemChannels.lifecycle.setMessageHandler((message) {
-      //   make the user status to online
-      if (message.toString().contains('resume')) {
-        FirebaseInstances.updateMyLastSeen(true);
-      }
-      // make the user status to offline
-      if (message.toString().contains('pause')) {
-        FirebaseInstances.updateMyLastSeen(false);
+      // we're checking if auth is not null because if we don't do it, the app will show the user as online
+      // even after signing out from the app
+      if (FirebaseAuth.instance.currentUser != null) {
+        //   make the user status to online
+        if (message.toString().contains('resume')) {
+          FirebaseInstances.updateMyLastSeen(true);
+        }
+        // make the user status to offline
+        if (message.toString().contains('pause')) {
+          FirebaseInstances.updateMyLastSeen(false);
+        }
       }
       return Future.value(message);
     });
@@ -132,12 +139,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: width * 0.03,
               ),
               InkWell(
-                onTap: () {
+                onTap: () async {
+                  await FirebaseInstances.getSelfInformation();
+
+                  // print("simple variable : ${FirebaseInstances.me}");
+                  // print("name: ${FirebaseInstances.me.name}");
+                  // print("about : ${FirebaseInstances.me.about}");
+                  // print("id: ${FirebaseInstances.me.id}");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          EditProfileScreen(currentUser: FirebaseInstances.me),
+                      builder: (context) => EditProfileScreen(
+                        currentUser: FirebaseInstances.me,
+                      ),
                     ),
                   );
                 },

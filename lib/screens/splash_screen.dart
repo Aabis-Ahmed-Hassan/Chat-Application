@@ -36,6 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // user is login
       if (FirebaseInstances.auth.currentUser != null) {
         // move to homescreen
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

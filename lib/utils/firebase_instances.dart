@@ -60,16 +60,19 @@ class FirebaseInstances {
 
   static late ChatUser me;
 
-  static Future<void> getSelfData() async {
+  static Future<void> getSelfInformation() async {
     await firestore
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get()
-        .then((user) {
-      if (user != null) {
+        .then((user) async {
+      if (user.exists) {
+        // print('aabis' + user['name'].toString());
         me = ChatUser.fromJson(user.data()!);
       } else {
-        getSelfData();
+        await createUser().then((value) {
+          getSelfInformation();
+        });
       }
     });
   }
@@ -220,5 +223,16 @@ class FirebaseInstances {
       'isOnline': isOnline,
       'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
     });
+  }
+
+  static void printAllInformation() {
+    print(' FirebaseInstances.auth.currentUser!.uid => ' +
+        FirebaseInstances.auth.currentUser!.uid);
+    print('FirebaseInstances.auth.currentUser!.displayName.toString() => ' +
+        FirebaseInstances.auth.currentUser!.displayName.toString());
+    print('FirebaseInstances.me.id.toString() => ' +
+        FirebaseInstances.me.id.toString());
+    print('FirebaseInstances.me.name.toString() => ' +
+        FirebaseInstances.me.name.toString());
   }
 }

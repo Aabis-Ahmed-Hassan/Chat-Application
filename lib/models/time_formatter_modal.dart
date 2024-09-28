@@ -31,15 +31,24 @@ class TimeFormatterModal {
     if (currentTime.year == inputTime.year &&
         currentTime.month == inputTime.month &&
         currentTime.day == inputTime.day) {
-      return 'Last Seen Today at  $formattedTime';
+      return '$formattedTime';
     }
 
     // yesterday
     else if ((currentTime.difference(inputTime).inHours / 24).round() == 1) {
-      return 'Last Seen Yesterday at $formattedTime';
+      return '$formattedTime';
     } else {
-      return 'Last seen at $formattedTime on ${inputTime.day} ${getMonth(inputTime)}';
+      return '$formattedTime on ${inputTime.day} ${getMonth(inputTime)}';
     }
+  }
+
+  static String formatForShowingAccountCreationDate(
+      String time, BuildContext context) {
+    DateTime inputTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+    DateTime currentTime = DateTime.now();
+    String formattedTime = TimeOfDay.fromDateTime(inputTime).format(context);
+
+    return '$formattedTime on ${inputTime.day} ${getMonth(inputTime)}, ${inputTime.year}';
   }
 
   static String getMonth(DateTime time) {

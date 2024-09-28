@@ -30,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    FirebaseInstances.printAllInformation();
     super.initState();
     _nameController.text = widget.currentUser.name ?? 'Null Name';
     _aboutController.text = widget.currentUser.about ?? 'Null About';
@@ -293,8 +294,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           onPressed: () async {
             await FirebaseInstances.auth.signOut().then((value) async {
               await GoogleSignIn().signOut().then((value) {
+                // await FirebaseInstances.updateMyLastSeen(false);
+
                 // to clear the stack
+
                 Navigator.pop(context);
+                // reinstantiating the auth method so that after signing in again, we'll not be using details of previous user
+                // FirebaseInstances.auth = FirebaseAuth.instance;
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
