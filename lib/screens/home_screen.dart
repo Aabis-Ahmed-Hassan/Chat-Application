@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     FirebaseInstances.getSelfInformation();
-    // FirebaseInstances.printAllInformation();
     //   update the user status to active
     FirebaseInstances.updateMyLastSeen(true);
     // update user's online/offline status

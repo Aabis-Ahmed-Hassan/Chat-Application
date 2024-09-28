@@ -5,6 +5,7 @@ import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/screens/auth/login_screen.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:chatapplication/utils/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -296,10 +297,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: Colors.white,
           onPressed: () async {
+            // saving user id so we'll be able to use it after the user is signout out (to make the user offline)
+            String id = FirebaseAuth.instance.currentUser!.uid;
+            await FirebaseInstances.updateMyLastSeen(false, userId: id);
             await FirebaseInstances.auth.signOut().then((value) async {
-              await GoogleSignIn().signOut().then((value) {
-                // await FirebaseInstances.updateMyLastSeen(false);
-
+              await GoogleSignIn().signOut().then((value) async {
                 // to clear the stack
 
                 // FirebaseInstances.me = ChatUser();

@@ -217,10 +217,24 @@ class FirebaseInstances {
         .snapshots();
   }
 
-  static Future<void> updateMyLastSeen(bool isOnline) async {
-    await firestore.collection('users').doc(currentUser.uid!).update({
+  static Future<void> updateMyLastSeen(bool isOnline, {String? userId}) async {
+    // using userId parameter so we change user online/offline status by manually putting the id because after
+    // signing out, we'll not be able to use the FirebaseAuth.instance.currentUser!.uid method
+    String id =
+        userId == null ? FirebaseAuth.instance.currentUser!.uid : userId;
+    print('FirebaseAuth.instance.currentUser!.uid: ' +
+        FirebaseAuth.instance.currentUser!.uid.toString());
+    print('currentUser!.uid: ' + currentUser!.uid.toString());
+    print('me.id: ' + me.id.toString());
+    await firestore.collection('users').doc(id).update({
       'isOnline': isOnline,
-      'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
+      'lastActive': DateTime.now().millisecondsSinceEpoch.toString(),
     });
   }
+  // static Future<void> updateMyLastSeen(bool isOnline) async {
+  //   await firestore.collection('users').doc(currentUser.uid!).update({
+  //     'isOnline': isOnline,
+  //     'lastActive': DateTime.now().millisecondsSinceEpoch.toString(),
+  //   });
+  // }
 }
