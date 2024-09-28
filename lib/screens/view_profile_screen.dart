@@ -1,12 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/models/time_formatter_modal.dart';
-import 'package:chatapplication/screens/auth/login_screen.dart';
-import 'package:chatapplication/utils/firebase_instances.dart';
-import 'package:chatapplication/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class ViewProfileScreen extends StatefulWidget {
   ViewProfileScreen({super.key, required this.currentUser});
@@ -98,9 +94,9 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
 
                       SizedBox(height: height * .025),
                       MyRow(
-                          title: 'Created At',
+                          title: 'Member Since',
                           subtitle:
-                              'Created At ${TimeFormatterModal.formatForShowingAccountCreationDate(widget.currentUser.createdAt.toString(), context)}'),
+                              '${TimeFormatterModal.formatForShowingAccountCreationDate(widget.currentUser.createdAt.toString(), context)}'),
                       SizedBox(height: height * .025),
                       MyRow(
                         title: 'Current Status',
@@ -122,39 +118,6 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                 ],
               ),
             ),
-          ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: Colors.white,
-          onPressed: () async {
-            await FirebaseInstances.auth.signOut().then((value) async {
-              await FirebaseInstances.updateMyLastSeen(false);
-              await GoogleSignIn().signOut().then((value) {
-                // to clear the stack
-
-                Navigator.pop(context);
-                // reinstantiating the auth method so that after signing in again, we'll not be using details of previous user
-                FirebaseInstances.auth = FirebaseInstances.auth;
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ),
-                );
-              }).catchError((e) {
-                Utils.showSnackBar(context, 'Sign out fail!');
-              });
-            }).catchError((e) {
-              Utils.showSnackBar(context, 'Sign out fail!');
-            });
-          },
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.logout),
-              Text('Logout'),
-            ],
           ),
         ),
       ),

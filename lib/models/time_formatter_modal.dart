@@ -48,7 +48,7 @@ class TimeFormatterModal {
     DateTime currentTime = DateTime.now();
     String formattedTime = TimeOfDay.fromDateTime(inputTime).format(context);
 
-    return '$formattedTime on ${inputTime.day} ${getMonth(inputTime)}, ${inputTime.year}';
+    return '${inputTime.day} ${getMonth(inputTime)}, ${inputTime.year}';
   }
 
   static String getMonth(DateTime time) {
