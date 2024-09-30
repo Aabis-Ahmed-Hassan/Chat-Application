@@ -3,9 +3,12 @@ import 'package:chatapplication/models/single_message_modal.dart';
 import 'package:chatapplication/models/time_formatter_modal.dart';
 import 'package:chatapplication/utils/constants.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
+import 'package:chatapplication/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class SingleMessage extends StatelessWidget {
   SingleMessage({super.key, required this.singleMessage});
@@ -31,9 +34,14 @@ class SingleMessage extends StatelessWidget {
                 InkWell(
                   onTap: () async {
                     await Clipboard.setData(ClipboardData(
-                        text:
-                            message.message ?? 'Error in copying the message'));
-                    Navigator.pop(context);
+                            text: message.message ??
+                                'Error in copying the message'))
+                        .then((value) {
+                      Navigator.pop(context);
+
+                      Utils.showSnackBar(
+                          context, 'Message copied successfully!');
+                    });
                   },
                   child: MessageOption(
                     title: 'Copy Text',
@@ -62,8 +70,9 @@ class SingleMessage extends StatelessWidget {
                 // delete message
                 InkWell(
                   onTap: () {
-                    FirebaseInstances.deleteMessage(message);
-                    Navigator.pop(context);
+                    FirebaseInstances.deleteMessage(message).then((value) {
+                      Navigator.pop(context);
+                    });
                   },
                   child: MessageOption(
                     title: 'Delete Message',
@@ -77,7 +86,7 @@ class SingleMessage extends StatelessWidget {
                 // sent at
                 MessageOption(
                   title:
-                      'Sent at ${TimeFormatterModal.format(message.sentTime.toString(), context)}',
+                      'Sent at ${TimeFormatterModal.formatTimeForSentAndReadMessage(message.sentTime.toString(), context)}',
                   icon: Icon(
                     Icons.remove_red_eye,
                     color: primaryColor,
@@ -87,12 +96,76 @@ class SingleMessage extends StatelessWidget {
                 MessageOption(
                   title: message.readTime!.isEmpty
                       ? 'Not Read Yet'
-                      : 'Read at ${TimeFormatterModal.format(message.readTime.toString(), context)}',
+                      : 'Read at ${TimeFormatterModal.formatTimeForSentAndReadMessage(message.readTime.toString(), context)}',
                   icon: Icon(
                     Icons.remove_red_eye,
                     color: Colors.green,
                   ),
                 ),
+                if (message.type == 'image')
+                  InkWell(
+                    onTap: () async {
+                      // we're using http because we have to give the image in Uint8List format to the ImageGallerSaver
+                      //  we can't do that with the image address which we've in message.message.toString
+                      // so we're using http package.
+                      try {
+                        // Fetch the image from the network
+                        final response = await http
+                            .get(Uri.parse(message.message.toString()));
+                        // Check if the response is successful
+                        if (response.statusCode == 200) {
+                          print('if state of response');
+                          // Return the body of the response as Uint8List
+                          await ImageGallerySaver.saveImage(response.bodyBytes);
+
+                          Navigator.pop(context);
+                          Utils.showSnackBar(
+                              context, 'Image saved successfully.');
+                        } else {
+                          print('else state of response');
+                          Navigator.pop(context);
+                          Utils.showSnackBar(context,
+                              'An error occurred while saving the image. ');
+                        }
+                      } catch (e) {
+                        Utils.showSnackBar(context,
+                            'An error occurred while saving the image. ');
+                      }
+                    },
+                    // onTap: () async {
+                    //
+                    //   await ImageGallerySaver.saveFile(
+                    //           message.message.toString())
+                    //       .then((success) {
+                    //     Navigator.pop(context);
+                    //     print('success: ' + success);
+                    //   });
+                    // },
+                    // onTap: () async {
+                    //   try {
+                    //     await ImageGallerySaver.saveFile(
+                    //             message.message.toString())
+                    //         .then((success) {
+                    //       Navigator.pop(context);
+                    //       if (success != null && success) {
+                    //         Utils.showSnackBar(
+                    //             context, 'Image saved successfully!');
+                    //       }
+                    //     });
+                    //   } catch (e) {
+                    //     print('Error while download image: ' + e.toString());
+                    //     Utils.showSnackBar(context,
+                    //         'An error occured while downloading the image. ');
+                    //   }
+                    // },
+                    child: MessageOption(
+                      title: 'Save Image',
+                      icon: Icon(
+                        Icons.download,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
               ],
             ),
           );
@@ -120,8 +193,10 @@ class SingleMessage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   FirebaseInstances.editMessage(
-                      message, _editController.text.toString());
-                  Navigator.pop(context);
+                          message, _editController.text.toString())
+                      .then((value) {
+                    Navigator.pop(context);
+                  });
                 },
                 child: Text('Edit'),
               ),

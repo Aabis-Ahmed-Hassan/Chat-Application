@@ -7,6 +7,24 @@ class TimeFormatterModal {
     return TimeOfDay.fromDateTime(time).format(context);
   }
 
+  static String formatTimeForSentAndReadMessage(
+      String time, BuildContext context) {
+    DateTime input = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+
+    DateTime now = DateTime.now();
+    if (input.year == now.year &&
+        input.month == now.month &&
+        input.day == now.day) {
+      return '${TimeOfDay.fromDateTime(input).format(context)} Today';
+    } else if (input.year == now.year &&
+        input.month == now.month &&
+        input.day == now.subtract(Duration(days: 1)).day) {
+      return '${TimeOfDay.fromDateTime(input).format(context)} Yesterday';
+    } else {
+      return '${TimeOfDay.fromDateTime(input).format(context)} on ${input.day} ${getMonth(input)}, ${input.year}';
+    }
+  }
+
   static String formatForMessageTimeOnChatCard(
       String time, BuildContext context) {
     DateTime inputTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));

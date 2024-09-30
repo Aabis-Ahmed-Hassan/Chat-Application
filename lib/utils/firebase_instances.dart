@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:chatapplication/models/ChatUser.dart';
 import 'package:chatapplication/models/single_message_modal.dart';
-import 'package:chatapplication/models/time_formatter_modal.dart';
 import 'package:chatapplication/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -150,8 +149,7 @@ class FirebaseInstances {
 
   static Future<void> updateReadMessageTime(
       SingleMessageModal message, BuildContext context) async {
-    String readTime = TimeFormatterModal.format(
-        DateTime.now().millisecondsSinceEpoch.toString(), context);
+    String readTime = DateTime.now().millisecondsSinceEpoch.toString();
     var ref2 =
         firestore.collection('chats/${message.conversationId}/messages/');
     await ref2.doc(message.sentTime).update({'readTime': '$readTime'});
@@ -207,6 +205,9 @@ class FirebaseInstances {
     var ref =
         await firestore.collection('chats/${message.conversationId}/messages/');
     await ref.doc(message.docId).delete();
+    if (message.type == 'image') {
+      await storage.refFromURL(message.message.toString()).delete();
+    }
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getUserLastSeen(

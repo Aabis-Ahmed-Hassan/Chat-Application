@@ -52,5 +52,11 @@
 	<string>Required permission</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Required permission</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+    <string>This app requires read and write access to the photo library.</string>
+
+
+
 </dict>
 </plist>
