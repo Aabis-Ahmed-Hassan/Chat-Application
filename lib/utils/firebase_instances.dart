@@ -237,4 +237,16 @@ class FirebaseInstances {
   //     'lastActive': DateTime.now().millisecondsSinceEpoch.toString(),
   //   });
   // }
+
+  static Future<void> editMessage(
+      SingleMessageModal message, String newMessageText) async {
+    await firestore
+        .collection('chats')
+        .doc(message.conversationId)
+        .collection('messages')
+        .doc(message.docId)
+        .update({
+      'message': newMessageText,
+    });
+  }
 }
