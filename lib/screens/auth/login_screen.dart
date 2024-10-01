@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
           accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
       return await FirebaseAuth.instance.signInWithCredential(credentials);
     } catch (e) {
-      Utils.showSnackBar(context, 'An error occured (${e.toString()})');
+      // Utils.showSnackBar(context, 'An error occured (${e.toString()})');
       return null;
     }
   }

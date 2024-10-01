@@ -5,6 +5,8 @@ class Utils {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        showCloseIcon: true,
+        duration: Duration(seconds: 2),
         content: Text(msg),
       ),
     );

@@ -15,7 +15,8 @@ class SingleMessage extends StatelessWidget {
 
   SingleMessageModal singleMessage;
 
-  showMessageOptions(BuildContext context, SingleMessageModal message) {
+  showMessageOptions(
+      BuildContext context, SingleMessageModal message, bool isMe) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -30,78 +31,30 @@ class SingleMessage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // copy message
-                InkWell(
-                  onTap: () async {
-                    await Clipboard.setData(ClipboardData(
-                            text: message.message ??
-                                'Error in copying the message'))
-                        .then((value) {
-                      Navigator.pop(context);
+                // copy message if it is not an image
 
-                      Utils.showSnackBar(
-                          context, 'Message copied successfully!');
-                    });
-                  },
-                  child: MessageOption(
-                    title: 'Copy Text',
-                    icon: Icon(
-                      Icons.copy_all_rounded,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-                Divider(),
-                // edit message
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
+                if (message.type == 'text')
+                  InkWell(
+                    onTap: () async {
+                      await Clipboard.setData(ClipboardData(
+                              text: message.message ??
+                                  'Error in copying the message'))
+                          .then((value) {
+                        Navigator.pop(context);
 
-                    showEditMessageDialog(context, message);
-                  },
-                  child: MessageOption(
-                    title: 'Edit Message',
-                    icon: Icon(
-                      Icons.edit,
-                      color: primaryColor,
+                        Utils.showSnackBar(
+                            context, 'Message copied successfully!');
+                      });
+                    },
+                    child: MessageOption(
+                      title: 'Copy Text',
+                      icon: Icon(
+                        Icons.copy_all_rounded,
+                        color: primaryColor,
+                      ),
                     ),
                   ),
-                ),
-                // delete message
-                InkWell(
-                  onTap: () {
-                    FirebaseInstances.deleteMessage(message).then((value) {
-                      Navigator.pop(context);
-                    });
-                  },
-                  child: MessageOption(
-                    title: 'Delete Message',
-                    icon: Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-                Divider(),
-                // sent at
-                MessageOption(
-                  title:
-                      'Sent at ${TimeFormatterModal.formatTimeForSentAndReadMessage(message.sentTime.toString(), context)}',
-                  icon: Icon(
-                    Icons.remove_red_eye,
-                    color: primaryColor,
-                  ),
-                ),
-                // read at
-                MessageOption(
-                  title: message.readTime!.isEmpty
-                      ? 'Not Read Yet'
-                      : 'Read at ${TimeFormatterModal.formatTimeForSentAndReadMessage(message.readTime.toString(), context)}',
-                  icon: Icon(
-                    Icons.remove_red_eye,
-                    color: Colors.green,
-                  ),
-                ),
+                // download image
                 if (message.type == 'image')
                   InkWell(
                     onTap: () async {
@@ -166,6 +119,65 @@ class SingleMessage extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                Divider(),
+                // allow sender to edit the message
+
+                if (isMe && message.type == 'text')
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+
+                      showEditMessageDialog(context, message);
+                    },
+                    child: MessageOption(
+                      title: 'Edit Message',
+                      icon: Icon(
+                        Icons.edit,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ),
+                // allow sender to delete message
+                if (isMe)
+                  InkWell(
+                    onTap: () {
+                      FirebaseInstances.deleteMessage(message).then((value) {
+                        Navigator.pop(context);
+                      });
+                    },
+                    child: MessageOption(
+                      title:
+                          'Delete ${message.type == 'text' ? 'Message' : 'Image'}',
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                // show this divider to sender only
+                if (isMe) Divider(),
+                // sent at
+                MessageOption(
+                  title:
+                      'Sent at ${TimeFormatterModal.formatTimeForSentAndReadMessage(message.sentTime.toString(), context)}',
+                  icon: Icon(
+                    Icons.remove_red_eye,
+                    color: primaryColor,
+                  ),
+                ),
+
+                // show message reading time to sender
+                if (isMe)
+                  MessageOption(
+                    title: message.readTime!.isEmpty
+                        ? 'Not Read Yet'
+                        : 'Read at ${TimeFormatterModal.formatTimeForSentAndReadMessage(message.readTime.toString(), context)}',
+                    icon: Icon(
+                      Icons.remove_red_eye,
+                      color: Colors.green,
+                    ),
+                  ),
               ],
             ),
           );
@@ -210,14 +222,15 @@ class SingleMessage extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
+    bool isMe =
+        singleMessage.senderId == FirebaseInstances.auth.currentUser!.uid;
+
+    return isMe ? SenderMessage(context) : ReceiverMessage(context);
     return singleMessage.senderId == FirebaseInstances.auth.currentUser!.uid
         ? SenderMessage(context)
         : ReceiverMessage(context);
     return InkWell(
-      onTap: showMessageOptions(
-        context,
-        singleMessage,
-      ),
+      onTap: showMessageOptions(context, singleMessage, isMe),
       child: singleMessage.senderId == FirebaseInstances.auth.currentUser!.uid
           ? SenderMessage(context)
           : ReceiverMessage(context),
@@ -232,6 +245,7 @@ class SingleMessage extends StatelessWidget {
         showMessageOptions(
           context,
           singleMessage,
+          true,
         );
       },
       child: Container(
@@ -302,58 +316,63 @@ class SingleMessage extends StatelessWidget {
       FirebaseInstances.updateReadMessageTime(singleMessage, context);
     }
 
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: height * 0.025,
-      ),
-      child: Row(
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: width * 0.65,
-            ),
-            padding: EdgeInsets.symmetric(
-                horizontal: height * 0.0125, vertical: height * 0.0125),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.purple,
+    return InkWell(
+      onLongPress: () {
+        showMessageOptions(context, singleMessage, false);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(
+          vertical: height * 0.025,
+        ),
+        child: Row(
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: width * 0.65,
               ),
-              color: Colors.purple.shade200,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-                bottomRight: Radius.circular(15),
+              padding: EdgeInsets.symmetric(
+                  horizontal: height * 0.0125, vertical: height * 0.0125),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.purple,
+                ),
+                color: Colors.purple.shade200,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                ),
               ),
+              child: singleMessage.type == 'text'
+                  ? Text(
+                      singleMessage.message.toString(),
+                      style: TextStyle(fontSize: 16),
+                    )
+                  : CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: singleMessage.message.toString(),
+                      placeholder: (context, url) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                      errorWidget: (context, url, error) {
+                        return Icon(Icons.image);
+                      },
+                    ),
             ),
-            child: singleMessage.type == 'text'
-                ? Text(
-                    singleMessage.message.toString(),
-                    style: TextStyle(fontSize: 16),
-                  )
-                : CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    imageUrl: singleMessage.message.toString(),
-                    placeholder: (context, url) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    },
-                    errorWidget: (context, url, error) {
-                      return Icon(Icons.image);
-                    },
-                  ),
-          ),
-          SizedBox(
-            width: width * 0.05,
-          ),
-          Spacer(),
-          Text(TimeFormatterModal.format(singleMessage.sentTime!, context)),
-          // Icon(
-          //   Icons.double_arrow,
-          //   color: Colors.blue,
-          //   size: 16,
-          // ),
-        ],
+            SizedBox(
+              width: width * 0.05,
+            ),
+            Spacer(),
+            Text(TimeFormatterModal.format(singleMessage.sentTime!, context)),
+            // Icon(
+            //   Icons.double_arrow,
+            //   color: Colors.blue,
+            //   size: 16,
+            // ),
+          ],
+        ),
       ),
     );
   }

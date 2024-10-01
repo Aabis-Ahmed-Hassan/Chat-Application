@@ -45,6 +45,7 @@ dependencies:
   firebase_storage: ^11.6.0
   emoji_picker_flutter: ^3.0.0
   image_gallery_saver:
+  fluttertoast: ^8.2.8
 
 
 dev_dependencies:
