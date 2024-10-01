@@ -1,15 +1,12 @@
+import 'package:chatapplication/screens/credits_screen.dart';
 import 'package:chatapplication/utils/firebase_instances.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../components/chat_card.dart';
 import '../models/ChatUser.dart';
-import '../utils/utils.dart';
-import 'auth/login_screen.dart';
 import 'edit_profile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -75,26 +72,19 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             leading: InkWell(
-              onTap: () async {
-                await FirebaseInstances.auth.signOut().then((value) async {
-                  await GoogleSignIn().signOut().then((value) {
-                    // to clear the stack
-                    Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginScreen(),
-                      ),
-                    );
-                  }).catchError((e) {
-                    Utils.showSnackBar(context, 'Sign out fail!');
-                  });
-                }).catchError((e) {
-                  Utils.showSnackBar(context, 'Sign out fail!');
-                });
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreditsScreen(),
+                  ),
+                );
               },
-              child: Icon(
-                CupertinoIcons.home,
+              child: Tooltip(
+                message: 'Credits',
+                child: Icon(
+                  Icons.info,
+                ),
               ),
             ),
             title: isSearching

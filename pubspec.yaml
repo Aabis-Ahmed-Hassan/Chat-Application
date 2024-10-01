@@ -46,6 +46,7 @@ dependencies:
   emoji_picker_flutter: ^3.0.0
   image_gallery_saver:
   fluttertoast: ^8.2.8
+  url_launcher: ^6.3.0
 
 
 dev_dependencies:

@@ -296,7 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               await FirebaseInstances.sendImageMessage(
                                   widget.user, File(file.path));
                               setState(() {
-                                _isUploading = true;
+                                _isUploading = false;
                               });
                             }
                           },
