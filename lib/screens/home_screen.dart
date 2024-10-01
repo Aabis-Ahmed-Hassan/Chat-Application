@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     FirebaseInstances.getSelfInformation();
     //   update the user status to active
     FirebaseInstances.updateMyLastSeen(true);
@@ -150,15 +151,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                child: const CircleAvatar(
-                  // backgroundImage: NetworkImage(list.isEmpty
-                  //     ? 'https://cdn-icons-png.flaticon.com/128/149/149071.png'
-                  //     : list[0].image!),
-                  backgroundImage: NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/128/149/149071.png',
-                  ),
-                ),
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            snapshot.data!['image'],
+                          ),
+                        );
+                      }
+                      return Container();
+                    }),
               ),
+              // InkWell(
+              //   onTap: () async {
+              //     await FirebaseInstances.getSelfInformation();
+              //
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => EditProfileScreen(
+              //           currentUser: FirebaseInstances.me,
+              //         ),
+              //       ),
+              //     );
+              //   },
+              //   child: const CircleAvatar(
+              //     // backgroundImage: NetworkImage(list.isEmpty
+              //     //     ? 'https://cdn-icons-png.flaticon.com/128/149/149071.png'
+              //     //     : list[0].image!),
+              //     backgroundImage: NetworkImage(
+              //       'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+              //     ),
+              //   ),
+              // ),
               SizedBox(
                 width: width * 0.03,
               ),

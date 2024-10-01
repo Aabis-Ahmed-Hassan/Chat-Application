@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   seconds: 1,
                 ),
                 top: height * .2,
-                right: _isAnimate ? width / 3 : 0,
+                right: _isAnimate ? width / 3.5 : 0,
                 child: Image.asset(
                     height: height * .15,
                     // width: width * .3,
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 duration: Duration(
                   seconds: 1,
                 ),
-                right: _isAnimate ? width / 4 : 0,
+                right: _isAnimate ? width / 8 : 0,
                 child: ElevatedButton(
                   onPressed: () async {
                     await _login();
