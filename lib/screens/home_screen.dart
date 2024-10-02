@@ -141,26 +141,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (snapshot.hasData && snapshot.data != null) {
-                        return CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            snapshot.data!['image'],
-                          ),
-                        );
-                      }
-                      return Container();
-                    }),
+                child: FutureBuilder(
+                  future: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.hasData && snapshot.data != null) {
+                      return CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          snapshot.data!['image'],
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
+                ),
               ),
               // InkWell(
               //   onTap: () async {

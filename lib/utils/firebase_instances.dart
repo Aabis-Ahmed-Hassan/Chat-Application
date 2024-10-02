@@ -69,9 +69,19 @@ class FirebaseInstances {
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsersExceptSelf() {
     return firestore
         .collection('users')
-        .where('id', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .where(
+          'id',
+          isNotEqualTo: FirebaseAuth.instance.currentUser!.uid,
+        )
         .snapshots();
   }
+
+  // static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsersExceptSelf() {
+  //   return firestore
+  //       .collection('users')
+  //       .where('id', isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
+  //       .snapshots();
+  // }
 
   static late ChatUser me;
 
